@@ -107,84 +107,81 @@ document.addEventListener('DOMContentLoaded', () => {
      * Fetches words from the API for a given topic.
      * NEW: Now supports variable word count
      */
-    async function getThreeWords(multipleMode = false) {
-        const topic = topicInput.value.trim();
-        if (!topic) {
-            showToast("⚠️ Please enter a topic.", "warning");
-            sounds.error();
+async function getThreeWords(multipleMode = false) {
+    const topic = topicInput.value.trim();
+    if (!topic) {
+        showToast("⚠️ Please enter a topic.", "warning");
+        sounds.error();
+        return;
+    }
+
+    // Duplicate detection
+    if (state.settings.duplicateWarning && state.lastGeneratedTopic === topic && !multipleMode) {
+        if (!confirm('You already generated this topic. Generate again?')) {
             return;
-        }
-
-        // NEW: Duplicate detection
-        if (state.settings.duplicateWarning && state.lastGeneratedTopic === topic && !multipleMode) {
-            if (!confirm('You already generated this topic. Generate again?')) {
-                return;
-            }
-        }
-
-        setLoading(true);
-        resultContainer.innerHTML = '';
-        resultContainer.classList.remove('visible');
-        if (multipleMode) multipleResults.innerHTML = '';
-
-        const wordCount = getWordCount();
-        const messages = [{
-            role: 'user',
-            content: `You are an agent for What3Topics. Describe the following topic in exactly ${wordCount} single simple, common, memorable and natural words, lowercase, separated by spaces and nothing else. Example: 'food health wellness' for 'healthy eating'. Topic: ${topic}`
-        }];
-
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ model: 'openai/gpt-oss-120b', messages })
-            });
-
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
-            const data = await response.json();
-            const rawContent = data.choices[0].message.content.trim();
-            const wordsArray = rawContent.replace(/[^a-zA-Z\s]/g, '').toLowerCase().split(/\s+/).filter(Boolean);
-
-            if (wordsArray.length === wordCount) {
-                const resultText = wordsArray.join('.');
-                displayResult(topic, resultText);
-                addToHistory(topic, resultText);
-                updateStatistics(topic);
-                state.lastGeneratedTopic = topic;
-                state.currentResult = { topic, words: resultText };
-                sounds.success();
-            } else {
-                displayError(`Could not get ${wordCount} words. Try again. Raw: "${rawContent}"`);
-                sounds.error();
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            displayError('❌ Failed to generate. Please check your network and try again.');
-            sounds.error();
-        } finally {
-            setLoading(false);
         }
     }
 
-    /**
-     * NEW: Generate multiple variations
-     */
-    async function generateMultipleVariations() {
-        const topic = topicInput.value.trim();
-        if (!topic) {
-            showToast("⚠️ Please enter a topic.", "warning");
-            return;
-        }
+    setLoading(true);
+    resultContainer.innerHTML = '';
+    resultContainer.classList.remove('visible');
+    if (multipleMode) multipleResults.innerHTML = '';
 
-        multipleResults.innerHTML = '<p style="text-align: center; opacity: 0.7;">Generating 3 variations...</p>';
-        
-        const variations = [];
-        for (let i = 0; i < 3; i++) {
-            await getThreeWords(true);
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Rate limiting
+    const wordCount = getWordCount();
+
+    const messages = [{
+        role: 'user',
+        content: `You are an agent for What3Topics. Always at all times, describe the following topic in exactly ${wordCount} simple, common, memorable, and natural lowercase words, separated by periods and nothing else — like 'food.health.wellness' for 'healthy eating'. Topic: ${topic}`
+    }];
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'openai/gpt-4o',
+                max_tokens: 10,
+                messages
+            })
+        });
+
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+        const data = await response.json();
+        const rawContent = data.choices?.[0]?.message?.content?.trim() || '';
+
+        // ✅ Normalize to three lowercase words separated by '.'
+        const normalized = rawContent
+            .toLowerCase()
+            .replace(/\s+/g, '.')        // convert spaces to dots if model used spaces
+            .replace(/[^a-z.]/g, '')     // strip invalid chars
+            .replace(/\.{2,}/g, '.')     // collapse multiple dots
+            .replace(/^\./, '')          // remove leading dot
+            .replace(/\.$/, '');         // remove trailing dot
+
+        const wordsArray = normalized.split('.').filter(Boolean);
+
+        if (wordsArray.length === wordCount) {
+            const resultText = wordsArray.join('.');
+            displayResult(topic, resultText);
+            addToHistory(topic, resultText);
+            updateStatistics(topic);
+            state.lastGeneratedTopic = topic;
+            state.currentResult = { topic, words: resultText };
+            sounds.success();
+        } else {
+            displayError(`Could not get ${wordCount} words. Try again. Raw: "${rawContent}"`);
+            sounds.error();
         }
+    } catch (error) {
+        console.error('Error:', error);
+        displayError('❌ Failed to generate. Please check your network and try again.');
+        sounds.error();
+    } finally {
+        setLoading(false);
     }
+}
+
 
     /**
      * Renders the result in the UI with animations.

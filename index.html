@@ -32,12 +32,12 @@
         <div class="header-actions">
             <!-- NEW: Stats Badge -->
             <button id="stats-btn" class="icon-btn" aria-label="View statistics">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg>
                 <span class="badge" id="total-generations">0</span>
             </button>
             <!-- NEW: Settings Button -->
             <button id="settings-btn" class="icon-btn" aria-label="Settings">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
             </button>
             <button id="theme-toggle-btn" aria-label="Toggle dark mode">
                 <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"></path><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7"></path></svg>
@@ -71,7 +71,7 @@
                     <label>Word Count:</label>
                     <div class="radio-group">
                         <label><input type="radio" name="word-count" value="2"> 2 words</label>
-                        <label><input type="radio" name="word-count" value="3" checked> 3 words</label>
+                        <label><input type="radio" name="word-count" value="3" checked=""> 3 words</label>
                         <label><input type="radio" name="word-count" value="4"> 4 words</label>
                         <label><input type="radio" name="word-count" value="5"> 5 words</label>
                     </div>
@@ -81,7 +81,7 @@
                     <button id="random-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-dice-6"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"></path><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle><circle cx="15.5" cy="7.5" r=".5" fill="currentColor"></circle><circle cx="8.5" cy="12" r=".5" fill="currentColor"></circle><circle cx="15.5" cy="12" r=".5" fill="currentColor"></circle><circle cx="15.5" cy="16.5" r=".5" fill="currentColor"></circle><circle cx="8.5" cy="16.5" r=".5" fill="currentColor"></circle></svg> Random</button>
                     <button id="surprise-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-cake"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M3 20h18v-8a3 3 0 0 0 -3 -3h-12a3 3 0 0 0 -3 3v8z"></path><path d="M3 14.803c.312 .135 .654 .204 1 .197a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1c.35 .007 .692 -.062 1 -.197"></path><path d="M12 4l1.465 1.638a2 2 0 1 1 -3.015 .099l1.55 -1.737z"></path></svg> Surprise</button>
                     <!-- NEW: Batch processing button -->
-                    <button id="batch-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Batch</button>
+                    <button id="batch-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg> Batch</button>
                 </div>
 
                 <div id="result-container" class="result-container" aria-live="polite">
@@ -115,11 +115,11 @@
                 <!-- NEW: Export/Import buttons -->
                 <div class="data-controls">
                     <button id="export-favorites-btn" class="secondary-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                         Export
                     </button>
                     <button id="import-favorites-btn" class="secondary-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                         Import
                     </button>
                 </div>
@@ -142,7 +142,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>📊 Your Statistics</h2>
-                <button class="close-modal" data-modal="stats-modal">&times;</button>
+                <button class="close-modal" data-modal="stats-modal">�</button>
             </div>
             <div class="modal-body">
                 <div class="stat-grid">
@@ -172,12 +172,12 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>⚙️ Settings</h2>
-                <button class="close-modal" data-modal="settings-modal">&times;</button>
+                <button class="close-modal" data-modal="settings-modal">�</button>
             </div>
             <div class="modal-body">
                 <div class="setting-item">
                     <label>
-                        <input type="checkbox" id="animations-toggle" checked>
+                        <input type="checkbox" id="animations-toggle" checked="">
                         Enable Animations
                     </label>
                 </div>
@@ -189,13 +189,13 @@
                 </div>
                 <div class="setting-item">
                     <label>
-                        <input type="checkbox" id="autocomplete-toggle" checked>
+                        <input type="checkbox" id="autocomplete-toggle" checked="">
                         Show Recent Topics Suggestions
                     </label>
                 </div>
                 <div class="setting-item">
                     <label>
-                        <input type="checkbox" id="duplicate-warning-toggle" checked>
+                        <input type="checkbox" id="duplicate-warning-toggle" checked="">
                         Warn About Duplicate Topics
                     </label>
                 </div>
@@ -216,11 +216,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>📦 Batch Processing</h2>
-                <button class="close-modal" data-modal="batch-modal">&times;</button>
+                <button class="close-modal" data-modal="batch-modal">�</button>
             </div>
             <div class="modal-body">
                 <p>Enter multiple topics (one per line):</p>
-                <textarea id="batch-input" rows="10" placeholder="quantum physics&#10;artificial intelligence&#10;climate change"></textarea>
+                <textarea id="batch-input" rows="10" placeholder="quantum physics
+artificial intelligence
+climate change"></textarea>
                 <button id="process-batch-btn" class="primary-btn">Process All</button>
                 <div id="batch-results" class="batch-results"></div>
             </div>
@@ -229,14 +231,14 @@
 
     <!-- NEW: Keyboard Shortcuts Help -->
     <button id="keyboard-shortcuts-btn" class="floating-help-btn" title="Keyboard Shortcuts (?)">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
     </button>
 
     <div id="shortcuts-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>⌨️ Keyboard Shortcuts</h2>
-                <button class="close-modal" data-modal="shortcuts-modal">&times;</button>
+                <button class="close-modal" data-modal="shortcuts-modal">�</button>
             </div>
             <div class="modal-body">
                 <div class="shortcuts-list">
@@ -280,5 +282,6 @@
     <div id="toast" class="toast"></div>
 
     <script src="js/script.js"></script>
+
 
 </body></html>
