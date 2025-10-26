@@ -103,6 +103,71 @@ document.addEventListener('DOMContentLoaded', () => {
         return parseInt(selected ? selected.value : 3);
     }
 
+    function createUserError(message) {
+        const error = new Error(message);
+        error.userMessage = true;
+        return error;
+    }
+
+    function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, (match) => {
+            switch (match) {
+                case '&':
+                    return '&amp;';
+                case '<':
+                    return '&lt;';
+                case '>':
+                    return '&gt;';
+                case '"':
+                    return '&quot;';
+                case "'":
+                    return '&#39;';
+                default:
+                    return match;
+            }
+        });
+    }
+
+    async function fetchTopicWords(topic, wordCount) {
+        const messages = [{
+            role: 'user',
+            content: `You are an agent for What3Topics. Always at all times, describe the following topic in exactly ${wordCount} simple, common, memorable, and natural lowercase words, separated by periods and nothing else — like 'food.health.wellness' for 'healthy eating'. Topic: ${topic}`
+        }];
+
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: 'openai/gpt-4o',
+                max_tokens: 10,
+                messages
+            })
+        });
+
+        if (!response.ok) {
+            throw createUserError('❌ Failed to generate topics. Please try again.');
+        }
+
+        const data = await response.json();
+        const rawContent = data.choices?.[0]?.message?.content?.trim() || '';
+
+        const normalized = rawContent
+            .toLowerCase()
+            .replace(/\s+/g, '.')
+            .replace(/[^a-z.]/g, '')
+            .replace(/\.{2,}/g, '.')
+            .replace(/^\./, '')
+            .replace(/\.$/, '');
+
+        const wordsArray = normalized.split('.').filter(Boolean);
+
+        if (wordsArray.length !== wordCount) {
+            throw createUserError(`Could not get ${wordCount} words. Try again. Raw: "${rawContent}"`);
+        }
+
+        return wordsArray.join('.');
+    }
+
     /**
      * Fetches words from the API for a given topic.
      * NEW: Now supports variable word count
@@ -129,53 +194,17 @@ async function getThreeWords(multipleMode = false) {
 
     const wordCount = getWordCount();
 
-    const messages = [{
-        role: 'user',
-        content: `You are an agent for What3Topics. Always at all times, describe the following topic in exactly ${wordCount} simple, common, memorable, and natural lowercase words, separated by periods and nothing else — like 'food.health.wellness' for 'healthy eating'. Topic: ${topic}`
-    }];
-
     try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                model: 'openai/gpt-4o',
-                max_tokens: 10,
-                messages
-            })
-        });
-
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
-        const data = await response.json();
-        const rawContent = data.choices?.[0]?.message?.content?.trim() || '';
-
-        // ✅ Normalize to three lowercase words separated by '.'
-        const normalized = rawContent
-            .toLowerCase()
-            .replace(/\s+/g, '.')        // convert spaces to dots if model used spaces
-            .replace(/[^a-z.]/g, '')     // strip invalid chars
-            .replace(/\.{2,}/g, '.')     // collapse multiple dots
-            .replace(/^\./, '')          // remove leading dot
-            .replace(/\.$/, '');         // remove trailing dot
-
-        const wordsArray = normalized.split('.').filter(Boolean);
-
-        if (wordsArray.length === wordCount) {
-            const resultText = wordsArray.join('.');
-            displayResult(topic, resultText);
-            addToHistory(topic, resultText);
-            updateStatistics(topic);
-            state.lastGeneratedTopic = topic;
-            state.currentResult = { topic, words: resultText };
-            sounds.success();
-        } else {
-            displayError(`Could not get ${wordCount} words. Try again. Raw: "${rawContent}"`);
-            sounds.error();
-        }
+        const resultText = await fetchTopicWords(topic, wordCount);
+        displayResult(topic, resultText);
+        addToHistory(topic, resultText);
+        updateStatistics(topic);
+        state.lastGeneratedTopic = topic;
+        state.currentResult = { topic, words: resultText };
+        sounds.success();
     } catch (error) {
         console.error('Error:', error);
-        displayError('❌ Failed to generate. Please check your network and try again.');
+        displayError(error.userMessage ? error.message : '❌ Failed to generate. Please check your network and try again.');
         sounds.error();
     } finally {
         setLoading(false);
@@ -652,37 +681,66 @@ async function getThreeWords(multipleMode = false) {
         processBatchBtn.disabled = true;
 
         const results = [];
-        for (let i = 0; i < topics.length; i++) {
-            const topic = topics[i].trim();
-            topicInput.value = topic;
-            
-            try {
-                // Simulate processing
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                results.push({ topic, words: 'sample.result.words', status: 'success' });
-            } catch (err) {
-                results.push({ topic, status: 'error' });
-            }
+        const wordCount = getWordCount();
+        let unexpectedError = false;
 
-            batchResults.innerHTML = `
-                <div class="batch-progress">
-                    <p>Processing: ${i + 1} / ${topics.length}</p>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${((i + 1) / topics.length) * 100}%"></div>
+        try {
+            for (let i = 0; i < topics.length; i++) {
+                const topic = topics[i].trim();
+
+                batchResults.innerHTML = `
+                    <div class="batch-progress">
+                        <p>Processing topic ${i + 1} of ${topics.length}</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${(i / topics.length) * 100}%"></div>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+
+                try {
+                    const words = await fetchTopicWords(topic, wordCount);
+                    results.push({ topic, words, status: 'success' });
+                    addToHistory(topic, words);
+                    updateStatistics(topic);
+                } catch (err) {
+                    console.error('Batch error:', err);
+                    results.push({
+                        topic,
+                        status: 'error',
+                        message: err.userMessage ? err.message : '❌ Failed to generate. Please try again.'
+                    });
+                }
+            }
+        } catch (err) {
+            unexpectedError = true;
+            console.error('Batch processing failed:', err);
+            showToast('❌ Batch processing failed unexpectedly. Please try again.', 'danger');
+        } finally {
+            processBatchBtn.disabled = false;
         }
 
-        // Display results
+        if (unexpectedError) {
+            return;
+        }
+
+        if (results.length === 0) {
+            batchResults.innerHTML = '<p>No topics were processed.</p>';
+            return;
+        }
+
         batchResults.innerHTML = results.map(r => `
             <div class="batch-result-item ${r.status}">
-                <strong>${r.topic}</strong>: ${r.status === 'success' ? `#${r.words}` : 'Error'}
+                <strong>${escapeHtml(r.topic)}</strong>: ${r.status === 'success' ? `#${escapeHtml(r.words)}` : escapeHtml(r.message || 'Error')}
             </div>
         `).join('');
 
-        processBatchBtn.disabled = false;
-        showToast(`✅ Processed ${results.length} topics!`);
+        const successCount = results.filter(r => r.status === 'success').length;
+        const errorCount = results.length - successCount;
+        const toastType = errorCount ? 'warning' : 'success';
+        const toastMessage = errorCount
+            ? `⚠️ Processed ${results.length} topics with ${errorCount} error${errorCount === 1 ? '' : 's'}.`
+            : `✅ Processed ${results.length} topics!`;
+        showToast(toastMessage, toastType);
     }
 
     /**
