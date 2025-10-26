@@ -11,7 +11,7 @@ Welcome to **What3Topics**, a **free and open-source** platform that transforms 
 
 ## 🚀 Features
 
-- ✨ **AI-powered topic generation** — powered by *OpenAI gpt-oss-120b* for unique, creative ideas.  
+- ✨ **AI-powered topic generation** — powered by *OpenAI's GPT-4o* (used to be gpt-oss-120b) for unique, creative ideas.  
 - 💬 **Flexible topic lengths** — from **2 to 5 words**, perfect for short, catchy ideas.  
 - ⭐ **Favorites system** — save your favorite topic ideas locally for quick access.  
 - 🔗 **Public sharing** — generate public links to share your topics with others.  
