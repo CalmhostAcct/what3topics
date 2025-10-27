@@ -8,7 +8,8 @@ Welcome to **What3Topics**, a **free and open-source** platform that transforms 
 🪐 **Backup URL:** [https://what3topics.pages.dev](https://what3topics.pages.dev)
 
 ---
-
+## Updates
+- You can now generate topic addresses from a file, and use any OpenAI or OpenAI-compatible API, and use any model with your API key! <br> You can also now choose your own accent color, and even custom CSS allowing you to theme the app however you want!
 ## 🚀 Features
 
 - ✨ **AI-powered topic generation** — powered by *OpenAI's GPT-4o* (used to be gpt-oss-120b) for unique, creative ideas.  
