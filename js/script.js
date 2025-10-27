@@ -33,6 +33,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const processBatchBtn = document.getElementById('process-batch-btn');
     const batchInput = document.getElementById('batch-input');
     const batchResults = document.getElementById('batch-results');
+    const uploadTopicBtn = document.getElementById('upload-topic-btn');
+    const topicFileInput = document.getElementById('topic-file-input');
+    const apiProviderSelect = document.getElementById('api-provider-select');
+    const customApiInput = document.getElementById('custom-api-input');
+    const apiKeyInput = document.getElementById('api-key-input');
+    const modelInput = document.getElementById('model-input');
+    const accentColorInput = document.getElementById('accent-color-input');
+    const resetAccentBtn = document.getElementById('reset-accent-btn');
+    const customCssInput = document.getElementById('custom-css-input');
+    const applyCustomCssBtn = document.getElementById('apply-custom-css-btn');
+    const clearCustomCssBtn = document.getElementById('clear-custom-css-btn');
+    const customApiWrapper = document.getElementById('custom-api-wrapper');
+    const apiKeyWrapper = document.getElementById('api-key-wrapper');
+
+    const DEFAULT_SETTINGS = {
+        animations: true,
+        sounds: false,
+        autocomplete: true,
+        duplicateWarning: true,
+        viewMode: 'normal',
+        apiProvider: 'w3tsrv',
+        customApiUrl: '',
+        apiKey: '',
+        model: 'openai/gpt-4o',
+        accentColor: '',
+        customCSS: ''
+    };
+
+    const DEFAULT_API_URL = 'https://w3tsrv.awesomeapps.workers.dev/';
+    const DEFAULT_ACCENT_COLOR = (getComputedStyle(document.documentElement).getPropertyValue('--primary-color') || '#553986').trim() || '#553986';
+    let customCssStyleEl = null;
 
     // --- State ---
     let state = {
@@ -44,20 +75,16 @@ document.addEventListener('DOMContentLoaded', () => {
             totalGenerations: 0,
             topicCounts: {}
         },
-        settings: JSON.parse(localStorage.getItem('w3t_settings')) || {
-            animations: true,
-            sounds: false,
-            autocomplete: true,
-            duplicateWarning: true,
-            viewMode: 'normal'
-        },
+        settings: (() => {
+            const stored = JSON.parse(localStorage.getItem('w3t_settings')) || {};
+            return { ...DEFAULT_SETTINGS, ...stored };
+        })(),
         undoStack: [],
         currentResult: null,
         lastGeneratedTopic: null
     };
 
     // --- API & Constants ---
-    const API_URL = 'https://w3tsrv.awesomeapps.workers.dev/';
     const RANDOM_TOPICS = ["space travel", "climate change", "artificial intelligence", "street food", "video games", "ancient history", "machine learning", "ocean exploration", "renewable energy", "deep sea diving", "urban gardening", "blockchain technology"];
     const SURPRISE_TOPICS = ["mystery islands", "robot pets", "galaxy travel", "hidden treasure", "jungle survival", "singing clouds", "time-traveling cats", "invisible friends", "dancing stars", "magical forests"];
 
@@ -128,20 +155,110 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    async function fetchTopicWords(topic, wordCount) {
-        const messages = [{
-            role: 'user',
-            content: `You are an agent for What3Topics. Always at all times, describe the following topic in exactly ${wordCount} simple, common, memorable, and natural lowercase words, separated by periods and nothing else — like 'food.health.wellness' for 'healthy eating'. Topic: ${topic}`
-        }];
+    function ensureCustomStyleElement() {
+        if (!customCssStyleEl) {
+            customCssStyleEl = document.getElementById('custom-css-style');
+            if (!customCssStyleEl) {
+                customCssStyleEl = document.createElement('style');
+                customCssStyleEl.id = 'custom-css-style';
+                document.head.appendChild(customCssStyleEl);
+            }
+        }
+        return customCssStyleEl;
+    }
 
-        const response = await fetch(API_URL, {
+    function saveSettings() {
+        localStorage.setItem('w3t_settings', JSON.stringify(state.settings));
+    }
+
+    function getApiUrl() {
+        switch (state.settings.apiProvider) {
+            case 'openai':
+                return 'https://api.openai.com/v1/chat/completions';
+            case 'custom':
+                return state.settings.customApiUrl?.trim() || '';
+            case 'w3tsrv':
+            default:
+                return DEFAULT_API_URL;
+        }
+    }
+
+    function getModelName() {
+        return (state.settings.model && state.settings.model.trim()) || DEFAULT_SETTINGS.model;
+    }
+
+    function applyAccentColor(color) {
+        const root = document.documentElement;
+        if (color) {
+            root.style.setProperty('--primary-color', color);
+            root.style.setProperty('--secondary-color', color);
+        } else {
+            root.style.removeProperty('--primary-color');
+            root.style.removeProperty('--secondary-color');
+        }
+    }
+
+    function applyCustomCss(css) {
+        const styleEl = ensureCustomStyleElement();
+        styleEl.textContent = css || '';
+    }
+
+    function updateApiSettingsUI() {
+        if (customApiWrapper) {
+            customApiWrapper.style.display = state.settings.apiProvider === 'custom' ? 'block' : 'none';
+        }
+        if (apiKeyWrapper) {
+            apiKeyWrapper.style.display = state.settings.apiProvider === 'w3tsrv' ? 'none' : 'block';
+        }
+        if (modelInput) {
+            modelInput.placeholder = state.settings.apiProvider === 'openai' ? 'gpt-4o-mini' : 'openai/gpt-4o';
+        }
+    }
+
+    async function fetchTopicWords(topic, wordCount, options = {}) {
+        const apiUrl = getApiUrl();
+        if (!apiUrl) {
+            throw createUserError('Please enter a valid API endpoint in Settings.');
+        }
+
+        if (state.settings.apiProvider === 'openai' && !state.settings.apiKey) {
+            throw createUserError('Please add your OpenAI API key in Settings before generating.');
+        }
+
+        const instructions = `You are an agent for What3Topics. Always at all times, describe the subject in exactly ${wordCount} simple, common, memorable, natural lowercase words separated by periods and nothing else.`;
+
+        const messages = [
+            { role: 'system', content: instructions }
+        ];
+
+        if (options.fileContent) {
+            const truncatedContent = options.fileContent.slice(0, 6000);
+            messages.push({
+                role: 'user',
+                content: `Use the following file contents to determine the primary topic or theme. Respond with exactly ${wordCount} lowercase words separated by periods. File name: ${options.fileName || 'uploaded-file'}\n\n${truncatedContent}`
+            });
+        } else {
+            messages.push({
+                role: 'user',
+                content: `Topic: ${topic}`
+            });
+        }
+
+        const headers = { 'Content-Type': 'application/json' };
+        if (state.settings.apiProvider !== 'w3tsrv' && state.settings.apiKey) {
+            headers.Authorization = `Bearer ${state.settings.apiKey}`;
+        }
+
+        const payload = {
+            model: getModelName(),
+            max_tokens: Math.max(20, wordCount * 6),
+            messages
+        };
+
+        const response = await fetch(apiUrl, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                model: 'openai/gpt-4o',
-                max_tokens: 10,
-                messages
-            })
+            headers,
+            body: JSON.stringify(payload)
         });
 
         if (!response.ok) {
@@ -210,6 +327,68 @@ async function getThreeWords(multipleMode = false) {
         setLoading(false);
     }
 }
+
+
+    async function generateFromFile(fileName, fileContent) {
+        const trimmedContent = (fileContent || '').trim();
+        if (!trimmedContent) {
+            showToast('⚠️ Selected file is empty.', 'warning');
+            return;
+        }
+
+        const wordCount = getWordCount();
+        const displayTopic = `File: ${fileName}`;
+
+        setLoading(true);
+        resultContainer.innerHTML = '';
+        resultContainer.classList.remove('visible');
+
+        try {
+            const words = await fetchTopicWords(displayTopic, wordCount, {
+                fileContent: trimmedContent,
+                fileName
+            });
+
+            displayResult(displayTopic, words);
+            addToHistory(displayTopic, words);
+            updateStatistics(displayTopic);
+            state.lastGeneratedTopic = displayTopic;
+            state.currentResult = { topic: displayTopic, words };
+            sounds.success();
+            showToast('✅ Generated description from file!');
+        } catch (error) {
+            console.error('File generation error:', error);
+            displayError(error.userMessage ? error.message : '❌ Failed to generate from file. Please check your settings and try again.');
+            sounds.error();
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    function readFileContent(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result || '');
+            reader.onerror = () => reject(reader.error || new Error('Failed to read file.'));
+            reader.readAsText(file);
+        });
+    }
+
+    async function handleTopicFileSelection(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+
+        try {
+            const content = await readFileContent(file);
+            topicInput.value = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]+/g, ' ');
+            await generateFromFile(file.name, content);
+        } catch (error) {
+            console.error('File load error:', error);
+            showToast('❌ Failed to read file. Please try another file.', 'danger');
+        } finally {
+            event.target.value = '';
+        }
+    }
 
 
     /**
@@ -847,6 +1026,8 @@ async function getThreeWords(multipleMode = false) {
         document.body.classList.toggle('no-animations', !state.settings.animations);
         document.body.classList.toggle('compact-view', state.settings.viewMode === 'compact');
         document.body.classList.toggle('expanded-view', state.settings.viewMode === 'expanded');
+        applyAccentColor(state.settings.accentColor);
+        applyCustomCss(state.settings.customCSS);
     }
 
     /**
@@ -886,6 +1067,11 @@ async function getThreeWords(multipleMode = false) {
         getThreeWords();
     });
 
+    if (uploadTopicBtn && topicFileInput) {
+        uploadTopicBtn.addEventListener('click', () => topicFileInput.click());
+        topicFileInput.addEventListener('change', handleTopicFileSelection);
+    }
+
     batchBtn.addEventListener('click', () => {
         openModal('batch-modal');
     });
@@ -920,32 +1106,109 @@ async function getThreeWords(multipleMode = false) {
     // Settings toggles
     document.getElementById('animations-toggle').addEventListener('change', (e) => {
         state.settings.animations = e.target.checked;
-        localStorage.setItem('w3t_settings', JSON.stringify(state.settings));
+        saveSettings();
         applySettings();
     });
-    
+
     document.getElementById('sound-toggle').addEventListener('change', (e) => {
         state.settings.sounds = e.target.checked;
-        localStorage.setItem('w3t_settings', JSON.stringify(state.settings));
+        saveSettings();
     });
-    
+
     document.getElementById('autocomplete-toggle').addEventListener('change', (e) => {
         state.settings.autocomplete = e.target.checked;
-        localStorage.setItem('w3t_settings', JSON.stringify(state.settings));
+        saveSettings();
     });
-    
+
     document.getElementById('duplicate-warning-toggle').addEventListener('change', (e) => {
         state.settings.duplicateWarning = e.target.checked;
-        localStorage.setItem('w3t_settings', JSON.stringify(state.settings));
+        saveSettings();
     });
-    
+
     document.getElementById('view-mode-select').addEventListener('change', (e) => {
         state.settings.viewMode = e.target.value;
-        localStorage.setItem('w3t_settings', JSON.stringify(state.settings));
+        saveSettings();
         applySettings();
         renderFavorites();
         renderHistory();
     });
+
+    if (apiProviderSelect) {
+        apiProviderSelect.addEventListener('change', (e) => {
+            state.settings.apiProvider = e.target.value;
+            if (state.settings.apiProvider === 'openai' && state.settings.model.startsWith('openai/')) {
+                state.settings.model = 'gpt-4o-mini';
+                if (modelInput) {
+                    modelInput.value = state.settings.model;
+                }
+            } else if (state.settings.apiProvider === 'w3tsrv' && !state.settings.model.startsWith('openai/')) {
+                state.settings.model = 'openai/gpt-4o';
+                if (modelInput) {
+                    modelInput.value = state.settings.model;
+                }
+            }
+            saveSettings();
+            updateApiSettingsUI();
+        });
+    }
+
+    if (customApiInput) {
+        customApiInput.addEventListener('input', (e) => {
+            state.settings.customApiUrl = e.target.value.trim();
+            saveSettings();
+        });
+    }
+
+    if (apiKeyInput) {
+        apiKeyInput.addEventListener('input', (e) => {
+            state.settings.apiKey = e.target.value.trim();
+            saveSettings();
+        });
+    }
+
+    if (modelInput) {
+        modelInput.addEventListener('input', (e) => {
+            state.settings.model = e.target.value.trim();
+            saveSettings();
+        });
+    }
+
+    if (accentColorInput) {
+        accentColorInput.addEventListener('input', (e) => {
+            state.settings.accentColor = e.target.value;
+            applyAccentColor(state.settings.accentColor);
+            saveSettings();
+        });
+    }
+
+    if (resetAccentBtn) {
+        resetAccentBtn.addEventListener('click', () => {
+            state.settings.accentColor = '';
+            if (accentColorInput) {
+                accentColorInput.value = DEFAULT_ACCENT_COLOR;
+            }
+            applyAccentColor('');
+            saveSettings();
+        });
+    }
+
+    if (applyCustomCssBtn && customCssInput) {
+        applyCustomCssBtn.addEventListener('click', () => {
+            state.settings.customCSS = customCssInput.value;
+            applyCustomCss(state.settings.customCSS);
+            saveSettings();
+            showToast('✅ Custom CSS applied!');
+        });
+    }
+
+    if (clearCustomCssBtn && customCssInput) {
+        clearCustomCssBtn.addEventListener('click', () => {
+            customCssInput.value = '';
+            state.settings.customCSS = '';
+            applyCustomCss('');
+            saveSettings();
+        });
+    }
 
     // Modal close buttons
     document.querySelectorAll('.close-modal').forEach(btn => {
@@ -1022,7 +1285,42 @@ async function getThreeWords(multipleMode = false) {
         document.getElementById('autocomplete-toggle').checked = state.settings.autocomplete;
         document.getElementById('duplicate-warning-toggle').checked = state.settings.duplicateWarning;
         document.getElementById('view-mode-select').value = state.settings.viewMode;
-        
+
+        if (apiProviderSelect) {
+            apiProviderSelect.value = state.settings.apiProvider;
+        }
+        if (customApiInput) {
+            customApiInput.value = state.settings.customApiUrl;
+        }
+        if (apiKeyInput) {
+            apiKeyInput.value = state.settings.apiKey;
+        }
+        if (modelInput) {
+            modelInput.value = state.settings.model;
+        }
+        if (accentColorInput) {
+            accentColorInput.value = state.settings.accentColor || DEFAULT_ACCENT_COLOR;
+        }
+        if (customCssInput) {
+            customCssInput.value = state.settings.customCSS || '';
+        }
+
+        if (state.settings.apiProvider === 'openai' && state.settings.model.startsWith('openai/')) {
+            state.settings.model = 'gpt-4o-mini';
+            if (modelInput) {
+                modelInput.value = state.settings.model;
+            }
+            saveSettings();
+        } else if (state.settings.apiProvider === 'w3tsrv' && !state.settings.model.startsWith('openai/')) {
+            state.settings.model = 'openai/gpt-4o';
+            if (modelInput) {
+                modelInput.value = state.settings.model;
+            }
+            saveSettings();
+        }
+
+        updateApiSettingsUI();
+
         applySettings();
         renderFavorites();
         renderHistory();
