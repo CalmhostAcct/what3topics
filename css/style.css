@@ -686,6 +686,67 @@ body.expanded-view .favorite-item {
     color: var(--text-color);
 }
 
+.settings-section + .settings-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.settings-section h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--heading-color);
+    margin-bottom: 0.5rem;
+}
+
+.setting-description {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.setting-item input[type="url"],
+.setting-item input[type="password"],
+.setting-item input[type="text"],
+.setting-item textarea {
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--input-bg-color);
+    color: var(--text-color);
+    font-size: 0.95rem;
+}
+
+.setting-item input[type="color"] {
+    width: 48px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+.accent-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.setting-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.small-btn {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.85rem;
+}
+
 /* NEW: Keyboard shortcuts */
 .shortcuts-list {
     display: flex;
