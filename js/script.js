@@ -34,7 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const batchInput = document.getElementById('batch-input');
     const batchResults = document.getElementById('batch-results');
     const uploadTopicBtn = document.getElementById('upload-topic-btn');
+    const importUrlBtn = document.getElementById('import-url-btn');
+    const importImageBtn = document.getElementById('import-image-btn');
     const topicFileInput = document.getElementById('topic-file-input');
+    const topicImageInput = document.getElementById('topic-image-input');
     const apiProviderSelect = document.getElementById('api-provider-select');
     const customApiInput = document.getElementById('custom-api-input');
     const apiKeyInput = document.getElementById('api-key-input');
@@ -46,6 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearCustomCssBtn = document.getElementById('clear-custom-css-btn');
     const customApiWrapper = document.getElementById('custom-api-wrapper');
     const apiKeyWrapper = document.getElementById('api-key-wrapper');
+    const importUrlInput = document.getElementById('import-url-input');
+    const fetchUrlBtn = document.getElementById('fetch-url-btn');
+    const siteNameInput = document.getElementById('site-name-input');
+    const logoUrlInput = document.getElementById('logo-url-input');
+    const resetLogoBtn = document.getElementById('reset-logo-btn');
+    const siteTitleEl = document.getElementById('site-title');
+    const logoImg = document.getElementById('logo');
 
     const DEFAULT_SETTINGS = {
         animations: true,
@@ -58,11 +68,14 @@ document.addEventListener('DOMContentLoaded', () => {
         apiKey: '',
         model: 'openai/gpt-4o',
         accentColor: '',
-        customCSS: ''
+        customCSS: '',
+        siteName: 'What3Topics',
+        logoUrl: 'images/logo.png'
     };
 
     const DEFAULT_API_URL = 'https://w3tsrv.awesomeapps.workers.dev/';
     const DEFAULT_ACCENT_COLOR = (getComputedStyle(document.documentElement).getPropertyValue('--primary-color') || '#553986').trim() || '#553986';
+    const DEFAULT_LOGO = 'images/logo.png';
     let customCssStyleEl = null;
 
     // --- State ---
@@ -83,6 +96,13 @@ document.addEventListener('DOMContentLoaded', () => {
         currentResult: null,
         lastGeneratedTopic: null
     };
+
+    if (!state.settings.siteName) {
+        state.settings.siteName = DEFAULT_SETTINGS.siteName;
+    }
+    if (!state.settings.logoUrl) {
+        state.settings.logoUrl = DEFAULT_LOGO;
+    }
 
     // --- API & Constants ---
     const RANDOM_TOPICS = ["space travel", "climate change", "artificial intelligence", "street food", "video games", "ancient history", "machine learning", "ocean exploration", "renewable energy", "deep sea diving", "urban gardening", "blockchain technology"];
@@ -198,6 +218,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function getSiteName() {
+        return (state.settings.siteName && state.settings.siteName.trim()) || DEFAULT_SETTINGS.siteName;
+    }
+
+    function getLogoUrl() {
+        return (state.settings.logoUrl && state.settings.logoUrl.trim()) || DEFAULT_LOGO;
+    }
+
+    function applyBranding() {
+        const siteName = getSiteName();
+        if (siteTitleEl) {
+            siteTitleEl.textContent = siteName;
+        }
+        document.title = `${siteName} | AI-Powered Three-Word Descriptions`;
+        if (logoImg) {
+            const desiredSrc = getLogoUrl();
+            if (logoImg.getAttribute('src') !== desiredSrc) {
+                logoImg.setAttribute('src', desiredSrc);
+            }
+            logoImg.setAttribute('alt', `${siteName} Logo`);
+        }
+    }
+
+    function handleLogoError() {
+        if (!logoImg) return;
+        if (state.settings.logoUrl && state.settings.logoUrl !== DEFAULT_LOGO) {
+            showToast('⚠️ Unable to load custom logo. Reverted to default.', 'warning');
+            state.settings.logoUrl = DEFAULT_LOGO;
+            if (logoUrlInput) {
+                logoUrlInput.value = DEFAULT_LOGO;
+            }
+            saveSettings();
+            applyBranding();
+        }
+    }
+
     function applyCustomCss(css) {
         const styleEl = ensureCustomStyleElement();
         styleEl.textContent = css || '';
@@ -225,23 +281,56 @@ document.addEventListener('DOMContentLoaded', () => {
             throw createUserError('Please add your OpenAI API key in Settings before generating.');
         }
 
-        const instructions = `You are an agent for What3Topics. Always at all times, describe the subject in exactly ${wordCount} simple, common, memorable, natural lowercase words separated by periods and nothing else.`;
+        const siteName = getSiteName();
+        const instructions = `You are an agent for ${siteName}. Always at all times, describe the subject in exactly ${wordCount} simple, common, memorable, natural lowercase words separated by periods and nothing else.`;
 
-        const messages = [
-            { role: 'system', content: instructions }
-        ];
+        const messages = [];
+        const usingImage = Boolean(options.imageData || options.imageUrl);
 
-        if (options.fileContent) {
-            const truncatedContent = options.fileContent.slice(0, 6000);
+        if (usingImage) {
+            if (state.settings.apiProvider === 'w3tsrv') {
+                throw createUserError('Image importing requires OpenAI or a custom compatible API.');
+            }
+
+            messages.push({
+                role: 'system',
+                content: [
+                    { type: 'text', text: instructions }
+                ]
+            });
+
+            const imagePrompt = options.imagePrompt || `Analyze the provided image and respond with exactly ${wordCount} lowercase words separated by periods that capture its main subject.`;
+            const userContent = [
+                { type: 'input_text', text: imagePrompt }
+            ];
+
+            if (options.imageUrl) {
+                userContent.push({ type: 'input_image_url', image_url: { url: options.imageUrl } });
+            } else if (options.imageData) {
+                const mediaType = options.imageMime || 'image/png';
+                userContent.push({ type: 'input_image_base64', image_base64: options.imageData, media_type: mediaType });
+            }
+
             messages.push({
                 role: 'user',
-                content: `Use the following file contents to determine the primary topic or theme. Respond with exactly ${wordCount} lowercase words separated by periods. File name: ${options.fileName || 'uploaded-file'}\n\n${truncatedContent}`
+                content: userContent
             });
         } else {
-            messages.push({
-                role: 'user',
-                content: `Topic: ${topic}`
-            });
+            messages.push({ role: 'system', content: instructions });
+
+            if (options.fileContent) {
+                const truncatedContent = (options.fileContent || '').slice(0, 6000);
+                const sourceLabel = options.url ? `URL: ${options.url}` : `File name: ${options.fileName || 'uploaded-file'}`;
+                messages.push({
+                    role: 'user',
+                    content: `Use the following ${options.url ? 'web page' : 'file'} contents to determine the primary topic or theme. Respond with exactly ${wordCount} lowercase words separated by periods. ${sourceLabel}\n\n${truncatedContent}`
+                });
+            } else {
+                messages.push({
+                    role: 'user',
+                    content: `Topic: ${topic}`
+                });
+            }
         }
 
         const headers = { 'Content-Type': 'application/json' };
@@ -329,6 +418,40 @@ async function getThreeWords(multipleMode = false) {
 }
 
 
+    async function generateFromSource(displayTopic, optionsBuilder, { successMessage, errorMessage } = {}) {
+        const wordCount = getWordCount();
+        const fetchOptions = typeof optionsBuilder === 'function' ? optionsBuilder(wordCount) : optionsBuilder;
+
+        setLoading(true);
+        resultContainer.innerHTML = '';
+        resultContainer.classList.remove('visible');
+
+        try {
+            const words = await fetchTopicWords(displayTopic, wordCount, fetchOptions || {});
+            displayResult(displayTopic, words);
+            addToHistory(displayTopic, words);
+            updateStatistics(displayTopic);
+            state.lastGeneratedTopic = displayTopic;
+            state.currentResult = { topic: displayTopic, words };
+            sounds.success();
+            if (successMessage) {
+                showToast(successMessage);
+            }
+            return true;
+        } catch (error) {
+            console.error('Generation error:', error);
+            const fallbackMessage = error.userMessage ? error.message : (errorMessage || '❌ Failed to generate. Please check your network and try again.');
+            displayError(fallbackMessage);
+            if (error.userMessage) {
+                showToast(error.message, 'danger');
+            }
+            sounds.error();
+            return false;
+        } finally {
+            setLoading(false);
+        }
+    }
+
     async function generateFromFile(fileName, fileContent) {
         const trimmedContent = (fileContent || '').trim();
         if (!trimmedContent) {
@@ -336,33 +459,14 @@ async function getThreeWords(multipleMode = false) {
             return;
         }
 
-        const wordCount = getWordCount();
         const displayTopic = `File: ${fileName}`;
-
-        setLoading(true);
-        resultContainer.innerHTML = '';
-        resultContainer.classList.remove('visible');
-
-        try {
-            const words = await fetchTopicWords(displayTopic, wordCount, {
-                fileContent: trimmedContent,
-                fileName
-            });
-
-            displayResult(displayTopic, words);
-            addToHistory(displayTopic, words);
-            updateStatistics(displayTopic);
-            state.lastGeneratedTopic = displayTopic;
-            state.currentResult = { topic: displayTopic, words };
-            sounds.success();
-            showToast('✅ Generated description from file!');
-        } catch (error) {
-            console.error('File generation error:', error);
-            displayError(error.userMessage ? error.message : '❌ Failed to generate from file. Please check your settings and try again.');
-            sounds.error();
-        } finally {
-            setLoading(false);
-        }
+        await generateFromSource(displayTopic, {
+            fileContent: trimmedContent,
+            fileName
+        }, {
+            successMessage: '✅ Generated description from file!',
+            errorMessage: '❌ Failed to generate from file. Please check your settings and try again.'
+        });
     }
 
     function readFileContent(file) {
@@ -372,6 +476,81 @@ async function getThreeWords(multipleMode = false) {
             reader.onerror = () => reject(reader.error || new Error('Failed to read file.'));
             reader.readAsText(file);
         });
+    }
+
+    function readFileAsDataURL(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result || '');
+            reader.onerror = () => reject(reader.error || new Error('Failed to read file.'));
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function deriveTopicFromUrl(url) {
+        try {
+            const urlObj = new URL(url);
+            const pathParts = urlObj.pathname.split('/').filter(Boolean);
+            const lastPart = pathParts.pop() || '';
+            const cleaned = decodeURIComponent(lastPart.replace(/[-_]+/g, ' ')).trim();
+            return cleaned || urlObj.hostname.replace(/^www\./, '');
+        } catch (error) {
+            console.warn('Failed to derive topic from URL', error);
+            return url;
+        }
+    }
+
+    async function fetchUrlContent(url) {
+        let response;
+        try {
+            response = await fetch(url);
+        } catch (error) {
+            throw createUserError('Could not reach the provided URL.');
+        }
+
+        if (!response.ok) {
+            throw createUserError(`Failed to fetch URL (status ${response.status}).`);
+        }
+
+        const contentType = (response.headers.get('content-type') || 'text/plain').toLowerCase();
+        const rawText = await response.text();
+
+        if (!rawText || !rawText.trim()) {
+            throw createUserError('The provided URL did not return any readable content.');
+        }
+
+        if (contentType.includes('text/html')) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(rawText, 'text/html');
+            doc.querySelectorAll('script,style,noscript').forEach(node => node.remove());
+            const title = doc.querySelector('title')?.textContent?.trim() || '';
+            const bodyText = (doc.body ? doc.body.textContent : doc.textContent) || '';
+            const normalized = bodyText.replace(/\s+/g, ' ').trim();
+            if (!normalized) {
+                throw createUserError('The provided URL did not contain readable text.');
+            }
+            return {
+                content: normalized,
+                suggestedTopic: title || deriveTopicFromUrl(url)
+            };
+        }
+
+        if (contentType.includes('application/json')) {
+            try {
+                const parsed = JSON.parse(rawText);
+                return {
+                    content: JSON.stringify(parsed, null, 2),
+                    suggestedTopic: deriveTopicFromUrl(url)
+                };
+            } catch (error) {
+                console.warn('Failed to parse JSON content', error);
+            }
+        }
+
+        return {
+            content: rawText.trim(),
+            suggestedTopic: deriveTopicFromUrl(url)
+        };
     }
 
     async function handleTopicFileSelection(event) {
@@ -387,6 +566,94 @@ async function getThreeWords(multipleMode = false) {
             showToast('❌ Failed to read file. Please try another file.', 'danger');
         } finally {
             event.target.value = '';
+        }
+    }
+
+    async function handleImageSelection(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+
+        try {
+            const dataUrl = await readFileAsDataURL(file);
+            const base64 = (dataUrl || '').toString().split(',')[1];
+            if (!base64) {
+                throw new Error('Missing base64 payload');
+            }
+
+            topicInput.value = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]+/g, ' ');
+
+            await generateFromSource(`Image: ${file.name}`, (wordCount) => ({
+                imageData: base64,
+                imageMime: file.type || 'image/png',
+                imagePrompt: `Analyze this image and respond with exactly ${wordCount} lowercase words separated by periods describing its main subject.`,
+            }), {
+                successMessage: '✅ Generated description from image!',
+                errorMessage: '❌ Failed to generate from image. Please try again.'
+            });
+        } catch (error) {
+            console.error('Image load error:', error);
+            showToast('❌ Failed to process image. Please try another file.', 'danger');
+        } finally {
+            event.target.value = '';
+        }
+    }
+
+    async function handleUrlFetch() {
+        if (!importUrlInput) return;
+
+        let urlValue = importUrlInput.value.trim();
+        if (!urlValue) {
+            showToast('⚠️ Please enter a URL.', 'warning');
+            return;
+        }
+
+        if (!/^https?:\/\//i.test(urlValue)) {
+            urlValue = `https://${urlValue}`;
+        }
+
+        let normalizedUrl;
+        try {
+            normalizedUrl = new URL(urlValue).toString();
+        } catch (error) {
+            showToast('❌ Please enter a valid URL.', 'danger');
+            return;
+        }
+
+        if (fetchUrlBtn) {
+            fetchUrlBtn.disabled = true;
+            fetchUrlBtn.textContent = 'Fetching...';
+        }
+
+        try {
+            const { content, suggestedTopic } = await fetchUrlContent(normalizedUrl);
+            if (!content) {
+                throw createUserError('The provided URL did not contain readable text.');
+            }
+
+            if (suggestedTopic) {
+                topicInput.value = suggestedTopic;
+            }
+
+            const success = await generateFromSource(`URL: ${normalizedUrl}`, {
+                fileContent: content,
+                url: normalizedUrl
+            }, {
+                successMessage: '✅ Generated description from URL!',
+                errorMessage: '❌ Failed to generate from URL. Please try again.'
+            });
+
+            if (success) {
+                closeModal('url-import-modal');
+                importUrlInput.value = '';
+            }
+        } catch (error) {
+            console.error('URL import error:', error);
+            showToast(error.userMessage ? error.message : '❌ Failed to import from URL. Please verify the address and try again.', 'danger');
+        } finally {
+            if (fetchUrlBtn) {
+                fetchUrlBtn.disabled = false;
+                fetchUrlBtn.textContent = 'Fetch & Generate';
+            }
         }
     }
 
@@ -455,9 +722,11 @@ async function getThreeWords(multipleMode = false) {
      * NEW: Share result via Web Share API
      */
     async function shareResult(topic, words) {
+        const siteName = getSiteName();
+        const wordCount = words.split('.').filter(Boolean).length;
         const shareData = {
-            title: 'What3Topics',
-            text: `Check out this 3-word description: #${words.replace(/\./g, '.')} for "${topic}"`,
+            title: siteName,
+            text: `Check out this ${wordCount}-word description from ${siteName}: #${words.replace(/\./g, '.')} for "${topic}"`,
             url: window.location.href + `?topic=${encodeURIComponent(topic)}&words=${encodeURIComponent(words)}`
         };
 
@@ -505,12 +774,18 @@ async function getThreeWords(multipleMode = false) {
      * NEW: Print result
      */
     function printResult(topic, words) {
+        const siteName = getSiteName();
         const printWindow = window.open('', '', 'width=600,height=400');
+        if (!printWindow) {
+            showToast('❌ Unable to open print dialog.', 'danger');
+            return;
+        }
+
         printWindow.document.write(`
             <!DOCTYPE html>
             <html>
             <head>
-                <title>What3Topics - ${topic}</title>
+                <title>${siteName} - ${topic}</title>
                 <style>
                     body { font-family: Arial, sans-serif; padding: 40px; text-align: center; }
                     h1 { color: #553986; font-size: 3rem; margin: 2rem 0; }
@@ -523,7 +798,7 @@ async function getThreeWords(multipleMode = false) {
             <body>
                 <h1>#${words.replace(/\./g, '.')}</h1>
                 <p>Topic: ${topic}</p>
-                <p style="margin-top: 2rem; font-size: 0.9rem; color: #999;">Generated by What3Topics</p>
+                <p style="margin-top: 2rem; font-size: 0.9rem; color: #999;">Generated by ${siteName}</p>
             </body>
             </html>
         `);
@@ -1028,6 +1303,7 @@ async function getThreeWords(multipleMode = false) {
         document.body.classList.toggle('expanded-view', state.settings.viewMode === 'expanded');
         applyAccentColor(state.settings.accentColor);
         applyCustomCss(state.settings.customCSS);
+        applyBranding();
     }
 
     /**
@@ -1045,6 +1321,10 @@ async function getThreeWords(multipleMode = false) {
     }
 
     // --- Event Listeners ---
+    if (logoImg) {
+        logoImg.addEventListener('error', handleLogoError);
+    }
+
     generateBtn.addEventListener('click', () => getThreeWords());
     topicInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') getThreeWords();
@@ -1070,6 +1350,33 @@ async function getThreeWords(multipleMode = false) {
     if (uploadTopicBtn && topicFileInput) {
         uploadTopicBtn.addEventListener('click', () => topicFileInput.click());
         topicFileInput.addEventListener('change', handleTopicFileSelection);
+    }
+
+    if (importImageBtn && topicImageInput) {
+        importImageBtn.addEventListener('click', () => topicImageInput.click());
+        topicImageInput.addEventListener('change', handleImageSelection);
+    }
+
+    if (importUrlBtn) {
+        importUrlBtn.addEventListener('click', () => {
+            openModal('url-import-modal');
+            if (importUrlInput) {
+                setTimeout(() => importUrlInput.focus(), 100);
+            }
+        });
+    }
+
+    if (fetchUrlBtn) {
+        fetchUrlBtn.addEventListener('click', handleUrlFetch);
+    }
+
+    if (importUrlInput) {
+        importUrlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleUrlFetch();
+            }
+        });
     }
 
     batchBtn.addEventListener('click', () => {
@@ -1210,6 +1517,47 @@ async function getThreeWords(multipleMode = false) {
         });
     }
 
+    if (siteNameInput) {
+        siteNameInput.addEventListener('input', () => {
+            state.settings.siteName = siteNameInput.value;
+            saveSettings();
+            applyBranding();
+        });
+        siteNameInput.addEventListener('blur', () => {
+            if (!siteNameInput.value.trim()) {
+                siteNameInput.value = DEFAULT_SETTINGS.siteName;
+                state.settings.siteName = DEFAULT_SETTINGS.siteName;
+                saveSettings();
+                applyBranding();
+            }
+        });
+    }
+
+    if (logoUrlInput) {
+        const applyLogo = () => {
+            const value = logoUrlInput.value.trim();
+            state.settings.logoUrl = value || DEFAULT_LOGO;
+            if (!value) {
+                logoUrlInput.value = DEFAULT_LOGO;
+            }
+            saveSettings();
+            applyBranding();
+        };
+        logoUrlInput.addEventListener('change', applyLogo);
+        logoUrlInput.addEventListener('blur', applyLogo);
+    }
+
+    if (resetLogoBtn) {
+        resetLogoBtn.addEventListener('click', () => {
+            state.settings.logoUrl = DEFAULT_LOGO;
+            if (logoUrlInput) {
+                logoUrlInput.value = DEFAULT_LOGO;
+            }
+            saveSettings();
+            applyBranding();
+        });
+    }
+
     // Modal close buttons
     document.querySelectorAll('.close-modal').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -1303,6 +1651,12 @@ async function getThreeWords(multipleMode = false) {
         }
         if (customCssInput) {
             customCssInput.value = state.settings.customCSS || '';
+        }
+        if (siteNameInput) {
+            siteNameInput.value = state.settings.siteName || DEFAULT_SETTINGS.siteName;
+        }
+        if (logoUrlInput) {
+            logoUrlInput.value = state.settings.logoUrl || DEFAULT_LOGO;
         }
 
         if (state.settings.apiProvider === 'openai' && state.settings.model.startsWith('openai/')) {

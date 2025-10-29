@@ -81,6 +81,14 @@ transition: filter var(--transition-speed) ease, transform var(--transition-spee
 transform: translateY(-2px);
 }
 
+.site-title {
+font-size: clamp(1.1rem, 2.4vw, 1.65rem);
+font-weight: 700;
+color: var(--heading-color);
+line-height: 1.1;
+transition: color var(--transition-speed) ease;
+}
+
 .main-content {
 display: grid;
 grid-template-columns: 1fr;

@@ -28,6 +28,7 @@
     <header class="site-header">
         <div class="logo-container">
             <img id="logo" src="images/logo.png" alt="What3Topics Logo" class="logo">
+            <span id="site-title" class="site-title">What3Topics</span>
         </div>
         <div class="header-actions">
             <!-- NEW: Stats Badge -->
@@ -39,7 +40,7 @@
             <button id="settings-btn" class="icon-btn" aria-label="Settings">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
             </button>
-            <button id="theme-toggle-btn" aria-label="Toggle dark mode">
+            <button id="theme-toggle-btn" class="icon-btn" aria-label="Toggle dark mode">
                 <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"></path><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7"></path></svg>
                 <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"></path></svg>
             </button>
@@ -83,9 +84,12 @@
                     <!-- NEW: Batch processing button -->
                     <button id="batch-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg> Batch</button>
                     <button id="upload-topic-btn" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path><path d="M7 9l5 -5l5 5"></path><path d="M12 4v12"></path></svg> From File</button>
+                    <button id="import-url-btn" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 1 0 -4l1 -1a3.5 3.5 0 0 1 5 5l-1 1"></path><path d="M14 10a3.5 3.5 0 0 1 0 4l-1 1a3.5 3.5 0 0 1 -5 -5l1 -1"></path><path d="M16 21v-2a4 4 0 0 0 -4 -4h-3"></path><path d="M5 12h-2a3 3 0 0 1 -3 -3v-4a3 3 0 0 1 3 -3h4a3 3 0 0 1 3 3v2"></path></svg> From URL</button>
+                    <button id="import-image-btn" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M15 8h.01"></path><path d="M3 6a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z"></path><path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l8 8"></path><path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3"></path></svg> From Image</button>
                 </div>
 
                 <input type="file" id="topic-file-input" accept=".txt,.md,.json,.csv,.log,.html,.xml" style="display: none;">
+                <input type="file" id="topic-image-input" accept="image/*" style="display: none;">
 
                 <div id="result-container" class="result-container" aria-live="polite">
                 </div>
@@ -259,6 +263,22 @@
                         </div>
                     </div>
                 </div>
+                <div class="settings-section">
+                    <h3>Branding</h3>
+                    <div class="setting-item">
+                        <label for="site-name-input">Site Name</label>
+                        <input type="text" id="site-name-input" placeholder="What3Topics">
+                        <p class="setting-description">Displayed in the header, document title, and share dialogs.</p>
+                    </div>
+                    <div class="setting-item">
+                        <label for="logo-url-input">Logo URL</label>
+                        <div class="accent-controls">
+                            <input type="url" id="logo-url-input" placeholder="https://example.com/logo.png">
+                            <button id="reset-logo-btn" class="secondary-btn small-btn" type="button">Reset</button>
+                        </div>
+                        <p class="setting-description">Use an absolute or relative URL. Leave blank to use the default logo.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -332,6 +352,23 @@ climate change"></textarea>
     </footer>
 
     <div id="toast" class="toast"></div>
+
+    <div id="url-import-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🌐 Import From URL</h2>
+                <button class="close-modal" data-modal="url-import-modal">�</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-item">
+                    <label for="import-url-input">Web address</label>
+                    <input type="url" id="import-url-input" placeholder="https://example.com/article">
+                </div>
+                <button id="fetch-url-btn" class="primary-btn" type="button">Fetch &amp; Generate</button>
+                <p class="setting-description" style="margin-top: 0.75rem;">We’ll fetch publicly available text and summarize it into your selected word count.</p>
+            </div>
+        </div>
+    </div>
 
     <script src="js/script.js"></script>
 
