@@ -9,10 +9,11 @@ Welcome to **What3Topics**, a **free and open-source** platform that transforms 
 
 ---
 ## Updates
+- Fixed Dark Mode and added changing logo and name, brand your What3topics however you like!
 - You can now generate topic addresses from a file, and use any OpenAI or OpenAI-compatible API, and use any model with your API key! <br> You can also now choose your own accent color, and even custom CSS allowing you to theme the app however you want!
 ## 🚀 Features
 
-- ✨ **AI-powered topic generation** — powered by *OpenAI's GPT-4o* (used to be gpt-oss-120b) for unique, creative ideas.  
+- ✨ **AI-powered topic generation** — powered by the open source **Llama 3.3 70B Instruct** model for unique, creative ideas.  
 - 💬 **Flexible topic lengths** — from **2 to 5 words**, perfect for short, catchy ideas.  
 - ⭐ **Favorites system** — save your favorite topic ideas locally for quick access.  
 - 🔗 **Public sharing** — generate public links to share your topics with others.  
@@ -36,7 +37,7 @@ The **👾 alien monster logo** symbolizes creativity, imagination, and the play
 ## 💻 Technology Stack
 
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript  
-- **AI Model:** OpenAI `gpt-oss-120b`  
+- **AI Model:** Llama 3.3 70B Instruct 
 - **Hosting:** GitHub Pages / Cloudflare Pages  
 - **QR Generation:** client-side libraries (no backend required)
 
