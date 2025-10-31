@@ -4,8 +4,7 @@
 
 Welcome to **What3Topics**, a **free and open-source** platform that transforms your ideas into concise, AI-generated topic descriptions — each expressed in **2 to 5 words**. Built entirely with **Static HTML, CSS, and JavaScript**, What3Topics is lightweight, fast, and simple to use — no servers, no databases, just pure web magic ⚡.
 
-👉 **Live Demo:** [https://w3t.chippytime.com](https://w3t.chippytime.com)  
-🪐 **Backup URL:** [https://what3topics.pages.dev](https://what3topics.pages.dev)
+🪐 **The URL:** [https://what3topics.pages.dev](https://what3topics.pages.dev)
 
 ---
 ## Updates
