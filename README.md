@@ -3,9 +3,11 @@
 **A creative 3-word topic generator powered by AI**
 
 Welcome to **What3Topics**, a **free and open-source** platform that transforms your ideas into concise, AI-generated topic descriptions — each expressed in **2 to 5 words**. Built entirely with **Static HTML, CSS, and JavaScript**, What3Topics is lightweight, fast, and simple to use — no servers, no databases, just pure web magic ⚡.
+What3Topics has been introduced around August to September 2025.
+**Keep in mind the hosted/prebuilt version of W3T does have a proxy named w3tsrv, which has security features like locks to specific servers via CORS, and via the Referrer header as well.
+You can run your own Cloudflare Worker to get around it and add your own limitrations. https://github.com/CalmhostAcct/w3tsrv**
 
 🪐 **The URL:** [https://what3topics.pages.dev](https://what3topics.pages.dev)
-
 ---
 ## Updates
 - Fixed Dark Mode and added changing logo and name, brand your What3topics however you like!
