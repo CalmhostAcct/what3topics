@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
         apiProvider: 'w3tsrv',
         customApiUrl: '',
         apiKey: '',
-        model: 'meta-llama/llama-3.3-70b-instruct:free',
+        model: 'openai/gpt-oss-120b',
         accentColor: '',
         customCSS: '',
         siteName: 'What3Topics',
