@@ -70,12 +70,12 @@ document.addEventListener('DOMContentLoaded', () => {
         accentColor: '',
         customCSS: '',
         siteName: 'What3Topics',
-        logoUrl: 'images/logo.png'
+        logoUrl: 'images/logo.svg'
     };
 
     const DEFAULT_API_URL = 'https://w3tsrv.awesomeapps.workers.dev/';
     const DEFAULT_ACCENT_COLOR = (getComputedStyle(document.documentElement).getPropertyValue('--primary-color') || '#553986').trim() || '#553986';
-    const DEFAULT_LOGO = 'images/logo.png';
+    const DEFAULT_LOGO = 'images/logo.svg';
     let customCssStyleEl = null;
 
     // --- State ---
