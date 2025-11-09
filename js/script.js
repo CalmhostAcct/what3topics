@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const siteName = getSiteName();
-        const instructions = `You are an agent for ${siteName}. Always at all times, describe the subject in exactly ${wordCount} simple, common, memorable, natural lowercase words separated by periods and nothing else.`;
+        const instructions = `You are an agent for ${siteName}. Always at all times, describe the subject in exactly ${wordCount} simple, common, memorable, natural lowercase words and a what3words-style address separated by periods and nothing else.`;
 
         const messages = [];
         const usingImage = Boolean(options.imageData || options.imageUrl);
