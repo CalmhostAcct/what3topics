@@ -16,7 +16,7 @@ You can run your own Cloudflare Worker to get around it and add your own limitra
 - You can now generate topic addresses from a file, and use any OpenAI or OpenAI-compatible API, and use any model with your API key! <br> You can also now choose your own accent color, and even custom CSS allowing you to theme the app however you want!
 ## 🚀 Features
 
-- ✨ **AI-powered topic generation** — powered by the open source **Llama 3.3 70B Instruct** model for unique, creative ideas.  
+- ✨ **AI-powered topic generation** — powered by the open source **OpenAI gpt-oss-120b** model for unique, creative ideas.  
 - 💬 **Flexible topic lengths** — from **2 to 5 words**, perfect for short, catchy ideas.  
 - ⭐ **Favorites system** — save your favorite topic ideas locally for quick access.  
 - 🔗 **Public sharing** — generate public links to share your topics with others.  
@@ -40,7 +40,7 @@ The **👾 alien monster logo** symbolizes creativity, imagination, and the play
 ## 💻 Technology Stack
 
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript  
-- **AI Model:** Llama 3.3 70B Instruct 
+- **AI Model:** OpenAI's gpt-oss-120b
 - **Hosting:** GitHub Pages / Cloudflare Pages  
 - **QR Generation:** client-side libraries (no backend required)
 
@@ -106,9 +106,6 @@ This project is released under the **MIT License**, meaning you’re free to use
 
 * 💌 Issues / Feature Requests: [GitHub Issues](https://github.com/CalmhostAcct/what3topics/issues)
 * 🧠 Explore & fork: [GitHub Repository](https://github.com/CalmhostAcct/what3topics)
-* 👾 Visit live app: [w3t.chippytime.com](https://w3t.chippytime.com)
+* 👾 Visit live app: [what3topics.pages.dev](https://what3topics.pages.dev)
 
 If you love What3Topics, give it a ⭐ on GitHub — it helps more creative people discover it!
-
-```
-```
