@@ -1,8 +1,8 @@
 /* --- CSS Variables & General Setup --- */
 :root {
 --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
---primary-color: #553986;
---secondary-color: #553986;
+--primary-color: #000000;
+--secondary-color: #000000;
 --success-color: #28a745;
 --warning-color: #ffc107;
 --danger-color: #dc3545;
@@ -46,7 +46,7 @@ scroll-behavior: smooth;
 }
 
 body {
-font-family: var(--font-family);
+font-family: var(--font-family) !important;
 background-color: var(--bg-color);
 color: var(--text-color);
 transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
