@@ -282,7 +282,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const siteName = getSiteName();
-        const instructions = `You are an agent for ${siteName}. Always at all times, describe the subject in exactly ${wordCount} simple, common, memorable, natural lowercase words and a what3words-style address separated by periods and nothing else.`;
+        const instructions = `
+You are an AI agent for ${siteName}.
+Your entire response must follow this exact format:
+
+<word1>.<word2>.<word3>
+
+Each word must:
+- be a simple, common, memorable English words
+- all lowercase
+- contain only letters (no spaces, punctuation, or numbers)
+- form a natural, intuitive description of the subject
+The address must be a what3words-style address.
+Do not include any explanations, extra text, or quotes — only the 3-word address.
+`;
 
         const messages = [];
         const usingImage = Boolean(options.imageData || options.imageUrl);
