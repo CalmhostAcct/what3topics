@@ -282,20 +282,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const siteName = getSiteName();
-        const instructions = `
+const instructions = `
 You are an AI agent for ${siteName}.
+
 Your entire response must follow this exact format:
 
-<word1>.<word2>.<word3>
+word1.word2.word3
+
+The three-word address must follow true what3words-style principles:
 
 Each word must:
-- be a simple, common, memorable English words
-- all lowercase
-- contain only letters (no spaces, punctuation, or numbers)
-- form a natural, intuitive description of the subject
-The address must be a what3words-style address.
-Do not include any explanations, extra text, or quotes — only the 3-word address.
+- be a simple, concrete, everyday English word
+- be easy to say aloud and easy to remember
+- be all lowercase
+- contain only letters
+- be different from the other two words
+- evoke a clear image (e.g., "clip", "apple", "leap")
+
+The full address must:
+- feel natural and balanced when spoken
+- avoid rare, abstract, or technical vocabulary
+- avoid plurals unless they feel naturally fitting
+- resemble authentic what3words addresses in tone and style
+
+Do not include explanations, punctuation, formatting, code fences, or extra text.
+Only output the three-word address.
 `;
+
 
         const messages = [];
         const usingImage = Boolean(options.imageData || options.imageUrl);
