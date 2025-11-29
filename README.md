@@ -1,4 +1,17 @@
-## **Note, What3Topics will no longer recieve any updates. Please use [https://chippytech.helioho.st/vectormap/](https://chippytech.helioho.st/vectormap/) instead, since it uses Embeddings and is more reliable. The only downside is that it is closed source.**
+
+
+## **Note**
+
+**What3Topics will no longer receive major updates.**
+A newer, more advanced version powered by embeddings is now available at:
+👉 **[https://chippytech.helioho.st/vectormap/](https://chippytech.helioho.st/vectormap/)**
+
+This upgraded platform offers **far more accurate topic mapping**, improved stability, and a smarter generation system compared to the original What3Topics. While it isn’t open source, it is actively maintained and continues to evolve rapidly.
+
+That said, the spirit of What3Topics isn’t going away. The classic version will still receive **occasional improvements**, and we’re exploring **new features**, quality-of-life upgrades, and even a **premium edition** with enhanced tools, customization options, and expanded AI capabilities. More will be shared soon!
+
+<hr>
+
 # 👾 What3Topics  
 
 **A creative 3-word topic generator powered by AI**
