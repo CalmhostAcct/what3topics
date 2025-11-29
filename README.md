@@ -1,5 +1,6 @@
-
+## **Note, What3Topics will no longer recieve any updates. Please use [https://chippytech.helioho.st/vectormap/](https://chippytech.helioho.st/vectormap/) instead, since it uses Embeddings and is more reliable. The only downside is that it is closed source.**
 # 👾 What3Topics  
+
 **A creative 3-word topic generator powered by AI**
 
 Welcome to **What3Topics**, a **free and open-source** platform that transforms your ideas into concise, AI-generated topic descriptions — each expressed in **2 to 5 words**. Built entirely with **Static HTML, CSS, and JavaScript**, What3Topics is lightweight, fast, and simple to use — no servers, no databases, just pure web magic ⚡.
